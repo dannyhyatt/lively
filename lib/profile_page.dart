@@ -15,7 +15,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-  File? _imageFile;
+  File? _image;
 
   @override
   void dispose() {
@@ -24,11 +24,14 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    setState(() {
-      _imageFile = pickedFile != null ? File(pickedFile.path) : null;
-    });
+  Future<void> _getImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
   }
 
   void _saveData() {
@@ -36,60 +39,6 @@ class _ProfilePageState extends State<ProfilePage> {
     String bio = _bioController.text;
 
     // add to database
-  }
-
-  Widget _buildProfileImage() {
-    return Center(
-      child: Stack(
-        children: [
-          CircleAvatar(
-            radius: 80,
-            backgroundImage: _imageFile != null
-                ? FileImage(_imageFile!)
-                : AssetImage('assets/images/avatar.jpeg'),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: IconButton(
-              icon: Icon(
-                Icons.camera_alt,
-                size: 24,
-                color: Colors.grey[800],
-              ),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          leading: Icon(Icons.photo_library),
-                          title: Text('Choose from gallery'),
-                          onTap: () {
-                            _pickImage(ImageSource.gallery);
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.camera_alt),
-                          title: Text('Take a picture'),
-                          onTap: () {
-                            _pickImage(ImageSource.camera);
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget build(BuildContext context) {
