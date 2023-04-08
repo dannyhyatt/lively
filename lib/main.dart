@@ -23,7 +23,8 @@ class MyApp extends StatelessWidget {
             foregroundColor: Color(0xffff471A), backgroundColor: Colors.white),
         appBarTheme: AppBarTheme(
           color: Colors.white,
-          titleTextStyle: TextStyle(color: Color(0xffff471A)),
+          titleTextStyle:
+              GoogleFonts.kanit(color: Color(0xffff471A), fontSize: 24.0),
         ),
       ),
       darkTheme: ThemeData(),
