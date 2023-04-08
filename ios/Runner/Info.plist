@@ -45,6 +45,20 @@
 	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.798973706338-ncq4uiqhp0q47pul6rvcuv26r9vde7uk</string>
+				<string>lively</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<array>
+				<string>com.example.lively</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
