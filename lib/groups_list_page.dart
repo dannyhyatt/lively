@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:lively/chat_page.dart';
 import 'package:lively/livestream_page.dart';
 import 'package:lively/model/mux_live_data.dart';
 import 'package:share_plus/share_plus.dart';
@@ -63,14 +64,6 @@ class _GroupListPageState extends State<GroupListPage> {
     });
   }
 
-  Future<MuxLiveData> createLiveStream() async {
-    final callable =
-        FirebaseFunctions.instance.httpsCallable('createLiveStream');
-    final response = await callable();
-    final muxLiveData = MuxLiveData.fromJson(response.data);
-    return muxLiveData;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +74,7 @@ class _GroupListPageState extends State<GroupListPage> {
               onPressed: () async {
                 // MuxLiveData liveStream = await createLiveStream();
                 Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => LiveStreamPage()));
+                    .push(MaterialPageRoute(builder: (_) => ChatPage()));
               },
               icon: Icon(Icons.start))
         ],
