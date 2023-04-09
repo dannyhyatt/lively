@@ -3,7 +3,8 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  String collectionId;
+  ChatPage({super.key, required this.collectionId});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
