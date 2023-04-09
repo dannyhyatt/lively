@@ -9,6 +9,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:lively/chat_page.dart';
 import 'package:lively/livestream_page.dart';
 import 'package:lively/model/mux_live_data.dart';
+import 'package:lively/profile_page.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:uni_links/uni_links.dart';
@@ -67,7 +68,20 @@ class _GroupListPageState extends State<GroupListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('lively')),
+      appBar: AppBar(
+        title: Text('lively'),
+        actions: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+            child: GestureDetector(
+              child:
+                  CircleAvatar(foregroundImage: NetworkImage(widget.imageUrl)),
+              onTap: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => ProfilePage())),
+            ),
+          ),
+        ],
+      ),
       body: ListView(
         children: groups
             .map((e) => InkWell(
