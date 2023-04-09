@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:lively/livestream_page.dart';
+import 'package:lively/model/mux_live_data.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:uni_links/uni_links.dart';
@@ -25,31 +28,25 @@ class _GroupListPageState extends State<GroupListPage> {
   List groups = [];
 
   _GroupListPageState() {
-    Future<void> initUniLinks() async {
-      // ... check initialLink
-
-      // Attach a listener to the stream
-      StreamSubscription _sub = linkStream.listen((String? link) {
-        // Parse the link and warn the user, if it is not correct
-        String groupId = link?.split('/').last ?? '';
-        FirebaseFirestore.instance.collection('groups').doc(groupId).update({
-          'members': FieldValue.arrayUnion(
-              [FirebaseAuth.instance.currentUser!.phoneNumber]),
-          'memberData': FieldValue.arrayUnion([
-            {
-              'phoneNumber': FirebaseAuth.instance.currentUser!.phoneNumber,
-              'name': widget.displayName,
-              'bio': widget.bio,
-              'imageUrl': widget.imageUrl,
-            }
-          ])
-        });
-      }, onError: (err) {
-        // Handle exception by warning the user their action did not succeed
+    StreamSubscription _sub = linkStream.listen((String? link) {
+      // Parse the link and warn the user, if it is not correct
+      debugPrint('received: $link');
+      String groupId = link?.split('/').last ?? '';
+      FirebaseFirestore.instance.collection('groups').doc(groupId).update({
+        'members': FieldValue.arrayUnion(
+            [FirebaseAuth.instance.currentUser!.phoneNumber]),
+        'memberData': FieldValue.arrayUnion([
+          {
+            'phoneNumber': FirebaseAuth.instance.currentUser!.phoneNumber,
+            'name': widget.displayName,
+            'bio': widget.bio,
+            'imageUrl': widget.imageUrl,
+          }
+        ])
       });
-
-      // NOTE: Don't forget to call _sub.cancel() in dispose()
-    }
+    }, onError: (err) {
+      // Handle exception by warning the user their action did not succeed
+    });
 
     FirebaseFirestore.instance
         .collection('groups')
@@ -66,11 +63,28 @@ class _GroupListPageState extends State<GroupListPage> {
     });
   }
 
+  Future<MuxLiveData> createLiveStream() async {
+    final callable =
+        FirebaseFunctions.instance.httpsCallable('createLiveStream');
+    final response = await callable();
+    final muxLiveData = MuxLiveData.fromJson(response.data);
+    return muxLiveData;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('lively'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                // MuxLiveData liveStream = await createLiveStream();
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => LiveStreamPage()));
+              },
+              icon: Icon(Icons.start))
+        ],
       ),
       body: ListView(
         children: groups
