@@ -146,15 +146,21 @@ class _GroupListPageState extends State<GroupListPage> {
         onPressed: () {
           String text = '';
           var members = [FirebaseAuth.instance.currentUser!.phoneNumber ?? ''];
-          showModalBottomSheet(
+          showDialog(
             context: context,
-            builder: (ctx) => Column(
-              children: [
-                Text('Create a new group'),
-                TextField(
-                  onChanged: (value) => text = value,
-                  decoration: InputDecoration(hintText: 'Group name...'),
-                  onSubmitted: ((value) {
+            builder: (ctx) => AlertDialog(
+              title: Text(
+                'Add a new group',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              content: TextField(
+                onChanged: (value) => text = value,
+                decoration:
+                    InputDecoration(hintText: 'Enter the name of your group'),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
                     debugPrint(text);
                     FirebaseFirestore.instance
                         .collection('groups')
@@ -171,33 +177,10 @@ class _GroupListPageState extends State<GroupListPage> {
                         }
                       ]
                     });
-                    Navigator.of(ctx).pop();
-                  }),
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Add'),
                 ),
-                TextButton(
-                    onPressed: () {
-                      debugPrint(text);
-                      FirebaseFirestore.instance
-                          .collection('groups')
-                          .add(<String, dynamic>{
-                        'name': text,
-                        'members': members,
-                        'memberData': [
-                          {
-                            'phoneNumber':
-                                FirebaseAuth.instance.currentUser!.phoneNumber,
-                            'name': widget.displayName,
-                            'bio': widget.bio,
-                            'imageUrl': widget.imageUrl,
-                          }
-                        ]
-                      });
-                      Navigator.of(context).pop();
-                      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      //     content:
-                      //         Text('Copied invite link to clipboard')));
-                    },
-                    child: Text('Submit'))
               ],
             ),
           );
