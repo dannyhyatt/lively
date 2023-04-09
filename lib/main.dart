@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart' as FirebaseUI;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:lively/groups_list_page.dart';
 import 'package:lively/profile_page.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,6 +21,11 @@ class MyApp extends StatelessWidget {
       title: 'lively',
       theme: ThemeData(
         primarySwatch: Colors.red,
+        primaryColor: const Color(0xffff471A),
+        buttonTheme: ButtonThemeData(buttonColor: Color(0xffff471A)),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Color(0xffff471A)))),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
             foregroundColor: Color(0xffff471A), backgroundColor: Colors.white),
         appBarTheme: AppBarTheme(
@@ -59,8 +66,21 @@ class _MyHomePageState extends State<MyHomePage> {
         print('User is currently signed out!');
       } else {
         print('User is signed in!');
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => ProfilePage()));
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.phoneNumber)
+            .get()
+            .then((snapshot) {
+          if (snapshot.exists)
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => GroupListPage(
+                    displayName: snapshot.data()?['name'],
+                    bio: snapshot.data()?['bio'],
+                    imageUrl: snapshot.data()?['imageUrl'])));
+          else
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => ProfilePage()));
+        });
       }
     });
   }
@@ -78,8 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'lively',
               style: GoogleFonts.kanit(
-                  fontSize: 36,
-                  color: Theme.of(context).appBarTheme.titleTextStyle!.color),
+                  fontSize: 36, color: const Color(0xffff471A)),
             ),
             ElevatedButton(
                 onPressed: () => {

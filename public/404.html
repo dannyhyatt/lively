@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Join a group</title>
+  </head>
+  <body>
+    Please open in the lively app.
+    <script>
+      var spl = window.location.href.split('/');
+      var groupId = spl[spl.length - 1];
+      console.log(groupId);
+      location.href = 'lively://' + groupId;
+    </script>
+  </body>
+</html>

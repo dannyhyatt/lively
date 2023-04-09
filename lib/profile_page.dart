@@ -70,8 +70,12 @@ class _ProfilePageState extends State<ProfilePage> {
       'imageUrl': imageUrl,
     }).then((value) {
       print('User added');
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (_) => GroupListPage()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (_) => GroupListPage(
+                displayName: name,
+                bio: bio,
+                imageUrl: imageUrl,
+              )));
     }).catchError((error) => print('Failed to add user: $error'));
   }
 
