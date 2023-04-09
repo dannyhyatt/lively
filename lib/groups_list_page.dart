@@ -67,64 +67,77 @@ class _GroupListPageState extends State<GroupListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('lively'),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                // MuxLiveData liveStream = await createLiveStream();
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => ChatPage()));
-              },
-              icon: Icon(Icons.start))
-        ],
-      ),
+      appBar: AppBar(title: Text('lively')),
       body: ListView(
         children: groups
-            .map((e) => Card(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    e.data()['name'] ?? 'empty group name',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 28),
-                                  ),
-                                  IconButton(
-                                      onPressed: () {
-                                        Share.share(
-                                            'https://lively-accef.web.app/join/${e.id}');
-                                      },
-                                      icon: Icon(Icons.ios_share))
-                                ],
-                              ),
-                              Divider(
-                                color: Colors.transparent,
-                              ),
-                              Text(
-                                e.data()['memberData'] is List
-                                    ? e
-                                        .data()['memberData']
-                                        .map((e) => e['name'])
-                                        .join(', ')
-                                    : '${e.data()['members']}'.substring(
-                                        1, '${e.data()['members']}'.length - 1),
-                                maxLines: 3,
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ],
-                          ),
-                          Text('O ' + (e.data()['last_live'] ?? ''))
-                        ]),
+            .map((e) => InkWell(
+                  onTap: () {
+                    debugPrint('q: ${'chat${e.id}'}');
+                    debugPrint('${widget.bio}');
+                    debugPrint('${widget.displayName}');
+                    debugPrint('${widget.imageUrl}');
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => ChatPage(
+                              collectionId: 'chat${e.id}',
+                              bio: widget.bio,
+                              displayName: widget.displayName,
+                              imageUrl: widget.imageUrl,
+                            )));
+                  },
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      e.data()['name'] ?? 'empty group name',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 28),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          Share.share(
+                                              'https://lively-accef.web.app/join/${e.id}');
+                                        },
+                                        icon: Icon(Icons.ios_share))
+                                  ],
+                                ),
+                                Divider(
+                                  color: Colors.transparent,
+                                ),
+                                Text(
+                                  e.data()['memberData'] is List
+                                      ? e
+                                          .data()['memberData']
+                                          .map((e) => e['name'])
+                                          .join(', ')
+                                      : '${e.data()['members']}'.substring(1,
+                                          '${e.data()['members']}'.length - 1),
+                                  maxLines: 3,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              (e.data()['is_live']
+                                  ? '⬤\nLive now\n1m left'
+                                  : '○\n3hr ago'),
+                              style: TextStyle(
+                                  color: e.data()['is_live']
+                                      ? Colors.red
+                                      : Colors.black),
+                              textAlign: TextAlign.center,
+                            )
+                          ]),
+                    ),
                   ),
                 ))
             .toList(),
