@@ -1,9 +1,23 @@
 import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lively/groups_list_page.dart';
+import 'package:path/path.dart' as Path;
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lively/main.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+FirebaseStorage storage = FirebaseStorage.instance;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -34,11 +48,31 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _saveData() {
+  Future<String> uploadImage() async {
+    String fileName = Path.basename(_image!.path);
+    Reference reference = storage.ref().child('images/$fileName');
+    UploadTask uploadTask = reference.putFile(_image!);
+    TaskSnapshot taskSnapshot = await uploadTask;
+    return await taskSnapshot.ref.getDownloadURL();
+  }
+
+  void _saveData() async {
     String name = _nameController.text;
     String bio = _bioController.text;
-
-    // add to database
+    String imageUrl = await uploadImage();
+    FirebaseFirestore firestone = FirebaseFirestore.instance;
+    firestone
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.phoneNumber)
+        .set({
+      'name': name,
+      'bio': bio,
+      'imageUrl': imageUrl,
+    }).then((value) {
+      print('User added');
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (_) => GroupListPage()));
+    }).catchError((error) => print('Failed to add user: $error'));
   }
 
   Widget build(BuildContext context) {
@@ -52,9 +86,14 @@ class _ProfilePageState extends State<ProfilePage> {
             GestureDetector(
               onTap: _getImage,
               child: CircleAvatar(
-                radius: 50,
+                radius: 100,
                 backgroundImage: _image != null ? FileImage(_image!) : null,
-                child: _image == null ? Icon(Icons.person) : null,
+                child: _image == null
+                    ? Icon(
+                        Icons.person,
+                        size: 100,
+                      )
+                    : null,
               ),
             ),
             SizedBox(height: 20),
